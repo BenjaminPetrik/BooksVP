@@ -1,0 +1,154 @@
+#:kivy 2.2.1
+#:import RV recycle_view.RV
+#:import BooksWindow books_window.BooksWindow
+#:import OptionsWindow options_window.OptionsWindow
+
+<Popup>:
+    title_align: "center"
+    auto_dismiss: False
+    size_hint: (1, 0.4)
+
+<Button>:
+    background_normal: "./icons/normal.png"
+    background_down: "./icons/down.png"
+    background_disabled_normal: "./icons/disabled.png"
+
+
+
+<MainWindow>:
+    id: main_window
+    BoxLayout:
+        orientation: "vertical"
+        ScreenManager:
+            id: scr_mngr
+            Screen:
+                id: books_menu
+                name: 'books_menu'
+                BooksWindow:
+            Screen:
+                id: options_menu
+                name: 'options_menu'
+                OptionsWindow:
+        BoxLayout:
+            size_hint: 1, 0.08
+            orientation: "horizontal"
+            spacing: 10
+            ToggleButton:
+                id: books_btn
+                state: "down"
+                on_release: root.books_menu_clicked()
+                Image:
+                    source: "./icons/book.png"
+                    size: 40, 40
+                    center: self.parent.center_x, self.parent.center_y + 20
+                Label:
+                    text: "Books"
+                    center: self.parent.center_x, self.parent.center_y - 20
+            ToggleButton:
+                id: options_btn
+                on_release: root.options_menu_clicked()
+                Image:
+                    source: "./icons/gear.png"
+                    size: 40, 40
+                    center: self.parent.center_x, self.parent.center_y + 20
+                Label:
+                    text: "Options"
+                    center: self.parent.center_x, self.parent.center_y - 20
+
+<BooksWindow>:
+    id: books_window
+    name: "books_window"
+    RelativeLayout:
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint: 1, 0.04
+            pos_hint: {"center_x": 0.5, "center_y": 0.975}
+            spacing: 10
+            Button:
+                id: add_btn
+                text: "Add"
+                on_release: root.add_btn_clicked()
+            Button:
+                id: edit_btn
+                text: "Edit"
+                on_release: root.edit_btn_clicked()
+                disabled: True
+            Button:
+                id: remove_btn
+                text: "Remove"
+                on_release: root.remove_btn_clicked()
+                disabled: True
+            Button:
+                id: complete_btn
+                text: "Complete"
+                on_release: root.complete_btn_clicked()
+                disabled: True
+        RV:
+            id: rec_view
+            size_hint: 1, 0.94
+            pos_hint: {"center_x": 0.5, "center_y": 0.478}
+
+<RV>:
+    viewclass: 'SelectableLabelAndImage'
+    bar_width: dp(20)
+    do_scroll_x: False
+    SelectableRecycleBoxLayout:
+        default_size: None, dp(56)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: False
+
+<SelectableLabelAndImage>:
+    id: rv_cls
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: "./icons/normal.png" if self.selected else "./icons/empty.png"
+    Image:
+        id: check_book
+        source: root.image_source
+        size_hint: 0.1, 1
+    Label:
+        text: root.text_content
+        size_hint: 0.9, 1
+        text_size: self.size
+        color: (1, 1, 1, 0.7) if root.image_source == "./icons/tick.png" else (1, 1, 1, 1)
+        italic: True if root.image_source == "./icons/tick.png" else False
+        halign: "left"
+        valign: "middle"
+
+
+<OptionsWindow>:
+    id: options_window
+    RelativeLayout:
+        Label:
+            text: "Options:"
+            font_size: "20sp"
+            pos_hint: {"center_x": 0.5, "center_y": 0.95}
+
+        BoxLayout:
+            size_hint: 1, 0.05
+            pos_hint: {"center_x": 0.5, "center_y": 0.9}
+            spacing: 10
+            orientation: "horizontal"
+            Label:
+                canvas:
+                    Color:
+                        rgba: (1, 1, 1, 1)
+                    Line:
+                        width: 2
+                        rectangle: self.x, self.y, self.width, self.height
+                text: "Delete all books?"
+            Button:
+                canvas:
+                    Color:
+                        rgba: (1, 1, 1, 1)
+                    Line:
+                        width: 2
+                        rectangle: self.x, self.y, self.width, self.height
+                text: "Delete all"
+                on_release: root.delete_all_books_popup()
